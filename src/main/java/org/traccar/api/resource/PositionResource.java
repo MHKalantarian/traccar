@@ -17,6 +17,7 @@ package org.traccar.api.resource;
 
 import org.traccar.Context;
 import org.traccar.api.BaseResource;
+import org.traccar.helper.KalmanFilter;
 import org.traccar.model.Position;
 
 import javax.ws.rs.Consumes;
@@ -43,9 +44,11 @@ public class PositionResource extends BaseResource {
             @QueryParam("from") Date from, @QueryParam("to") Date to)
             throws SQLException {
         if (!positionIds.isEmpty()) {
+            KalmanFilter kalmanFilter = new KalmanFilter();
             ArrayList<Position> positions = new ArrayList<>();
             for (Long positionId : positionIds) {
                 Position position = Context.getDataManager().getObject(Position.class, positionId);
+                position = kalmanFilter.applyFilter(position);
                 Context.getPermissionsManager().checkDevice(getUserId(), position.getDeviceId());
                 positions.add(position);
             }
@@ -61,5 +64,6 @@ public class PositionResource extends BaseResource {
             }
         }
     }
+
 
 }

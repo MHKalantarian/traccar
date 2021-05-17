@@ -18,9 +18,19 @@
 
     -->
 
-    <entry key='database.driver'>org.h2.Driver</entry>
-    <entry key='database.url'>jdbc:h2:./data/database</entry>
-    <entry key='database.user'>sa</entry>
-    <entry key='database.password'></entry>
+    <entry key='database.driverFile'>C:\sqljdbc_9.2\enu\jre8\mssql-jdbc-9.2.1.jre8.jar</entry>
+    <entry key='database.driver'>com.microsoft.sqlserver.jdbc.SQLServerDriver</entry>
+    <entry key='database.url'>
+        jdbc:sqlserver://AliSQLRahnemaOfogh.mssql.somee.com;user=parsa_dragon93_SQLLogin_1;password=fhsp54ny76;databaseName=AliSQLRahnemaOfogh;
+    </entry>
+    <entry key='database.user'>parsa_dragon93_SQLLogin_1</entry>
+    <entry key='database.password'>fhsp54ny76</entry>
 
+    <entry key='geocoder.enable'>true</entry>
+    <entry key='geocoder.type'>nominatim</entry>
+    <entry key='geocoder.url'>https://nominatim.openstreetmap.org/reverse</entry>
+
+    <entry key='geolocation.enable'>true</entry>
+    <entry key='geolocation.type'>opencellid</entry>
+    <entry key='geolocation.key'>pk.7284318ac2d39653075aab00786628af</entry>
 </properties>
