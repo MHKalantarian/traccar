@@ -2,8 +2,8 @@
 
 import sys
 import math
-import urllib
-import httplib
+import urllib.parse
+import http.client
 import time
 import random
 
@@ -49,7 +49,7 @@ def send(conn, lat, lon, course, speed, alarm, ignition, accuracy, rpm, fuel, dr
         params = params + (('fuel', fuel),)
     if driverUniqueId:
         params = params + (('driverUniqueId', driverUniqueId),)
-    conn.request('GET', '?' + urllib.urlencode(params))
+    conn.request('GET', '?' + urllib.parse.urlencode(params))
     conn.getresponse().read()
 
 def course(lat1, lon1, lat2, lon2):
@@ -63,7 +63,7 @@ def course(lat1, lon1, lat2, lon2):
 
 index = 0
 
-conn = httplib.HTTPConnection(server)
+conn = http.client.HTTPConnection(server)
 
 while True:
     (lat1, lon1) = points[index % len(points)]
