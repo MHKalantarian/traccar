@@ -1,6 +1,5 @@
 package org.traccar.helper;
 
-
 import org.traccar.model.Position;
 
 public class KalmanFilter {
