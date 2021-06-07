@@ -35,7 +35,7 @@ public class KalmanFilter {
      * newTimeStamp - time of measurement in millis
      */
     public Position applyFilter(Position position) {
-        LOGGER.info("Before > " +position.getLatitude() + "," + position.getLongitude());
+        LOGGER.info("Before > " + position.getLatitude() + "," + position.getLongitude());
         if (variance < 0) {
             // if variance < 0, object is uninitialised, so initialise with current values
             setState(position.getLatitude(), position.getLongitude(), position.getFixTime().getTime(), MIN_ACCURACY);
@@ -61,7 +61,7 @@ public class KalmanFilter {
             // Return filtered point
             position.setLongitude(longitude);
             position.setLatitude(latitude);
-            LOGGER.info("After > " +position.getLatitude() + "," + position.getLongitude());
+            LOGGER.info("After > " + position.getLatitude() + "," + position.getLongitude());
         }
         return position;
     }

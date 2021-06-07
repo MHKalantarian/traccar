@@ -17,7 +17,6 @@ package org.traccar.api.resource;
 
 import org.traccar.Context;
 import org.traccar.api.BaseResource;
-import org.traccar.helper.KalmanFilter;
 import org.traccar.model.Position;
 
 import javax.ws.rs.Consumes;
