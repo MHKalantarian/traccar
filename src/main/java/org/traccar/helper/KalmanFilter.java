@@ -1,14 +1,18 @@
 package org.traccar.helper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.traccar.model.Position;
 
+
 public class KalmanFilter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(KalmanFilter.class);
 
     private long timeStamp; // In millisecond
     private double latitude; // In degrees
     private double longitude; // In degrees
     private float variance; // P matrix. Initial estimate of error
-    public static final float MIN_ACCURACY = 3f; // Increase/decrease based on usage
+    public static final float MIN_ACCURACY = 100f; // Increase/decrease based on usage
 
     public KalmanFilter() {
         variance = -1;
@@ -31,6 +35,7 @@ public class KalmanFilter {
      * newTimeStamp - time of measurement in millis
      */
     public Position applyFilter(Position position) {
+        LOGGER.info("Before > " +position.getLatitude() + "," + position.getLongitude());
         if (variance < 0) {
             // if variance < 0, object is uninitialised, so initialise with current values
             setState(position.getLatitude(), position.getLongitude(), position.getFixTime().getTime(), MIN_ACCURACY);
@@ -56,6 +61,7 @@ public class KalmanFilter {
             // Return filtered point
             position.setLongitude(longitude);
             position.setLatitude(latitude);
+            LOGGER.info("After > " +position.getLatitude() + "," + position.getLongitude());
         }
         return position;
     }

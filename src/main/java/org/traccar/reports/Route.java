@@ -27,6 +27,7 @@ import java.util.Date;
 
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.traccar.Context;
+import org.traccar.helper.KalmanFilter;
 import org.traccar.model.Device;
 import org.traccar.model.Group;
 import org.traccar.model.Position;
@@ -38,23 +39,26 @@ public final class Route {
     }
 
     public static Collection<Position> getObjects(long userId, Collection<Long> deviceIds, Collection<Long> groupIds,
-            Date from, Date to) throws SQLException {
+                                                  Date from, Date to) throws SQLException {
         ReportUtils.checkPeriodLimit(from, to);
         ArrayList<Position> result = new ArrayList<>();
-        for (long deviceId: ReportUtils.getDeviceList(deviceIds, groupIds)) {
+        for (long deviceId : ReportUtils.getDeviceList(deviceIds, groupIds)) {
             Context.getPermissionsManager().checkDevice(userId, deviceId);
-            result.addAll(Context.getDataManager().getPositions(deviceId, from, to));
+            KalmanFilter kalmanFilter = new KalmanFilter();
+            for (Position routePos : Context.getDataManager().getPositions(deviceId, from, to)) {
+                result.add(kalmanFilter.applyFilter(routePos));
+            }
         }
         return result;
     }
 
     public static void getExcel(OutputStream outputStream,
-            long userId, Collection<Long> deviceIds, Collection<Long> groupIds,
-            Date from, Date to) throws SQLException, IOException {
+                                long userId, Collection<Long> deviceIds, Collection<Long> groupIds,
+                                Date from, Date to) throws SQLException, IOException {
         ReportUtils.checkPeriodLimit(from, to);
         ArrayList<DeviceReport> devicesRoutes = new ArrayList<>();
         ArrayList<String> sheetNames = new ArrayList<>();
-        for (long deviceId: ReportUtils.getDeviceList(deviceIds, groupIds)) {
+        for (long deviceId : ReportUtils.getDeviceList(deviceIds, groupIds)) {
             Context.getPermissionsManager().checkDevice(userId, deviceId);
             Collection<Position> positions = Context.getDataManager()
                     .getPositions(deviceId, from, to);
