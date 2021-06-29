@@ -12,10 +12,11 @@ public class KalmanFilter {
     private double latitude; // In degrees
     private double longitude; // In degrees
     private float variance; // P matrix. Initial estimate of error
-    public static final float MIN_ACCURACY = 100f; // Increase/decrease based on usage
+    public  final float MIN_ACCURACY; // Increase/decrease based on usage
 
-    public KalmanFilter() {
+    public KalmanFilter(float MIN_ACCURACY) {
         variance = -1;
+        this.MIN_ACCURACY = MIN_ACCURACY;
     }
 
     // Set previous state

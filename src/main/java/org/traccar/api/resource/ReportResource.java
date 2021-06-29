@@ -66,8 +66,8 @@ public class ReportResource extends BaseResource {
         void execute(ByteArrayOutputStream stream) throws SQLException, IOException;
     }
 
-    private Response executeReport(
-            long userId, boolean mail, ReportExecutor executor) throws SQLException, IOException {
+    private Response executeReport(long userId, boolean mail, ReportExecutor executor)
+            throws SQLException, IOException {
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
         if (mail) {
             new Thread(() -> {
@@ -77,11 +77,11 @@ public class ReportResource extends BaseResource {
                     MimeBodyPart attachment = new MimeBodyPart();
 
                     attachment.setFileName("report.xlsx");
-                    attachment.setDataHandler(new DataHandler(new ByteArrayDataSource(
-                            stream.toByteArray(), "application/octet-stream")));
+                    attachment.setDataHandler(
+                            new DataHandler(new ByteArrayDataSource(stream.toByteArray(), "application/octet-stream")));
 
-                    Context.getMailManager().sendMessage(
-                            userId, "Report", "The report is in the attachment.", attachment);
+                    Context.getMailManager().sendMessage(userId, "Report", "The report is in the attachment.",
+                            attachment);
                 } catch (SQLException | IOException | MessagingException e) {
                     LOGGER.warn("Report failed", e);
                 }
@@ -96,20 +96,21 @@ public class ReportResource extends BaseResource {
 
     @Path("route")
     @GET
-    public Collection<Position> getRoute(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("from") Date from, @QueryParam("to") Date to) throws SQLException {
+    public Collection<Position> getRoute(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("from") Date from, @QueryParam("to") Date to,
+            @QueryParam("kalmanFilter") Float kalmanFilter) throws SQLException {
         LogAction.logReport(getUserId(), "route", from, to, deviceIds, groupIds);
-        return Route.getObjects(getUserId(), deviceIds, groupIds, from, to);
+        if (kalmanFilter < 1)
+            kalmanFilter = 1f;
+        return Route.getObjects(getUserId(), deviceIds, groupIds, from, to, kalmanFilter);
     }
 
     @Path("route")
     @GET
     @Produces(XLSX)
-    public Response getRouteExcel(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("from") Date from, @QueryParam("to") Date to, @QueryParam("mail") boolean mail)
-            throws SQLException, IOException {
+    public Response getRouteExcel(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("from") Date from, @QueryParam("to") Date to,
+            @QueryParam("mail") boolean mail) throws SQLException, IOException {
         return executeReport(getUserId(), mail, stream -> {
             LogAction.logReport(getUserId(), "route", from, to, deviceIds, groupIds);
             Route.getExcel(stream, getUserId(), deviceIds, groupIds, from, to);
@@ -118,9 +119,8 @@ public class ReportResource extends BaseResource {
 
     @Path("events")
     @GET
-    public Collection<Event> getEvents(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("type") final List<String> types,
+    public Collection<Event> getEvents(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("type") final List<String> types,
             @QueryParam("from") Date from, @QueryParam("to") Date to) throws SQLException {
         LogAction.logReport(getUserId(), "events", from, to, deviceIds, groupIds);
         return Events.getObjects(getUserId(), deviceIds, groupIds, types, from, to);
@@ -129,9 +129,8 @@ public class ReportResource extends BaseResource {
     @Path("events")
     @GET
     @Produces(XLSX)
-    public Response getEventsExcel(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("type") final List<String> types,
+    public Response getEventsExcel(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("type") final List<String> types,
             @QueryParam("from") Date from, @QueryParam("to") Date to, @QueryParam("mail") boolean mail)
             throws SQLException, IOException {
         return executeReport(getUserId(), mail, stream -> {
@@ -142,10 +141,9 @@ public class ReportResource extends BaseResource {
 
     @Path("summary")
     @GET
-    public Collection<SummaryReport> getSummary(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("from") Date from, @QueryParam("to") Date to, @QueryParam("daily") boolean daily)
-            throws SQLException {
+    public Collection<SummaryReport> getSummary(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("from") Date from, @QueryParam("to") Date to,
+            @QueryParam("daily") boolean daily) throws SQLException {
         LogAction.logReport(getUserId(), "summary", from, to, deviceIds, groupIds);
         return Summary.getObjects(getUserId(), deviceIds, groupIds, from, to, daily);
     }
@@ -153,11 +151,9 @@ public class ReportResource extends BaseResource {
     @Path("summary")
     @GET
     @Produces(XLSX)
-    public Response getSummaryExcel(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("from") Date from, @QueryParam("to") Date to, @QueryParam("daily") boolean daily,
-            @QueryParam("mail") boolean mail)
-            throws SQLException, IOException {
+    public Response getSummaryExcel(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("from") Date from, @QueryParam("to") Date to,
+            @QueryParam("daily") boolean daily, @QueryParam("mail") boolean mail) throws SQLException, IOException {
         return executeReport(getUserId(), mail, stream -> {
             LogAction.logReport(getUserId(), "summary", from, to, deviceIds, groupIds);
             Summary.getExcel(stream, getUserId(), deviceIds, groupIds, from, to, daily);
@@ -167,9 +163,9 @@ public class ReportResource extends BaseResource {
     @Path("trips")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<TripReport> getTrips(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("from") Date from, @QueryParam("to") Date to) throws SQLException {
+    public Collection<TripReport> getTrips(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("from") Date from, @QueryParam("to") Date to)
+            throws SQLException {
         LogAction.logReport(getUserId(), "trips", from, to, deviceIds, groupIds);
         return Trips.getObjects(getUserId(), deviceIds, groupIds, from, to);
     }
@@ -177,10 +173,9 @@ public class ReportResource extends BaseResource {
     @Path("trips")
     @GET
     @Produces(XLSX)
-    public Response getTripsExcel(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("from") Date from, @QueryParam("to") Date to, @QueryParam("mail") boolean mail)
-            throws SQLException, IOException {
+    public Response getTripsExcel(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("from") Date from, @QueryParam("to") Date to,
+            @QueryParam("mail") boolean mail) throws SQLException, IOException {
         return executeReport(getUserId(), mail, stream -> {
             LogAction.logReport(getUserId(), "trips", from, to, deviceIds, groupIds);
             Trips.getExcel(stream, getUserId(), deviceIds, groupIds, from, to);
@@ -190,9 +185,9 @@ public class ReportResource extends BaseResource {
     @Path("stops")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<StopReport> getStops(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("from") Date from, @QueryParam("to") Date to) throws SQLException {
+    public Collection<StopReport> getStops(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("from") Date from, @QueryParam("to") Date to)
+            throws SQLException {
         LogAction.logReport(getUserId(), "stops", from, to, deviceIds, groupIds);
         return Stops.getObjects(getUserId(), deviceIds, groupIds, from, to);
     }
@@ -200,10 +195,9 @@ public class ReportResource extends BaseResource {
     @Path("stops")
     @GET
     @Produces(XLSX)
-    public Response getStopsExcel(
-            @QueryParam("deviceId") final List<Long> deviceIds, @QueryParam("groupId") final List<Long> groupIds,
-            @QueryParam("from") Date from, @QueryParam("to") Date to, @QueryParam("mail") boolean mail)
-            throws SQLException, IOException {
+    public Response getStopsExcel(@QueryParam("deviceId") final List<Long> deviceIds,
+            @QueryParam("groupId") final List<Long> groupIds, @QueryParam("from") Date from, @QueryParam("to") Date to,
+            @QueryParam("mail") boolean mail) throws SQLException, IOException {
         return executeReport(getUserId(), mail, stream -> {
             LogAction.logReport(getUserId(), "stops", from, to, deviceIds, groupIds);
             Stops.getExcel(stream, getUserId(), deviceIds, groupIds, from, to);
