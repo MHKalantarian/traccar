@@ -98,11 +98,11 @@ public class ReportResource extends BaseResource {
     @GET
     public Collection<Position> getRoute(@QueryParam("deviceId") final List<Long> deviceIds,
             @QueryParam("groupId") final List<Long> groupIds, @QueryParam("from") Date from, @QueryParam("to") Date to,
-            @QueryParam("kalmanFilter") Float kalmanFilter) throws SQLException {
+            @QueryParam("kfa") Float kfa) throws SQLException {
         LogAction.logReport(getUserId(), "route", from, to, deviceIds, groupIds);
-        if (kalmanFilter < 1)
-            kalmanFilter = 1f;
-        return Route.getObjects(getUserId(), deviceIds, groupIds, from, to, kalmanFilter);
+        if (kfa < 1)
+            kfa = 1f;
+        return Route.getObjects(getUserId(), deviceIds, groupIds, from, to, kfa);
     }
 
     @Path("route")

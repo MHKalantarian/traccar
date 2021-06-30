@@ -39,12 +39,12 @@ public final class Route {
     }
 
     public static Collection<Position> getObjects(long userId, Collection<Long> deviceIds, Collection<Long> groupIds,
-                                                  Date from, Date to, float kalmanFilter) throws SQLException {
+                                                  Date from, Date to, Float kfa) throws SQLException {
         ReportUtils.checkPeriodLimit(from, to);
         ArrayList<Position> result = new ArrayList<>();
         for (long deviceId : ReportUtils.getDeviceList(deviceIds, groupIds)) {
             Context.getPermissionsManager().checkDevice(userId, deviceId);
-            KalmanFilter filter = new KalmanFilter(kalmanFilter);
+            KalmanFilter filter = new KalmanFilter(kfa);
             for (Position routePos : Context.getDataManager().getPositions(deviceId, from, to)) {
                 result.add(filter.applyFilter(routePos));
             }
